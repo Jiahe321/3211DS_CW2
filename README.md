@@ -6,3 +6,8 @@
 2. git pull拉取远程最新代码
 3. 照理来说不会有冲突，冲突了自己解决一下，确定能编译能跑再执行下一步
 4. git stash pop 然后commit和push
+
+# 任务列表
+- Task 1: Simulated Data
+- Task 2: Statistics
+- Task 3: Realistic Scenario
