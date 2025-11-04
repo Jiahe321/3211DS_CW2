@@ -4,6 +4,7 @@
 - VS Code
 - Azure Functions扩展，用于本地连接Azure Function，详细配置过程链接: https://learn.microsoft.com/zh-cn/azure/azure-functions/how-to-create-function-vs-code?pivots=programming-language-python
 - git可以使用一些好用的插件，比如GitLens之类的，这样可以不用手动敲代码
+
 ## git操作提示
 本地写代码, 提交之前请先：
 1. git stash暂存本地更改
@@ -18,3 +19,5 @@
 - Task 1: Simulated Data
 - Task 2: Statistics
 - Task 3: Realistic Scenario
+
+需要先创建一个空文件夹，把它连接到Azure Function，然后把代码放进去。推荐做法是自己写的代码放在一个单独的utils文件夹里，然后在Azure Function的文件里import进来。确定本地能跑通之后再push上来。全部完成之后再考虑部署到Azure上。
