@@ -4,6 +4,7 @@
 - VS Code
 - Azure Functions扩展，用于本地连接Azure Function，详细配置过程链接: https://learn.microsoft.com/zh-cn/azure/azure-functions/how-to-create-function-vs-code?pivots=programming-language-python
 - git可以使用一些好用的插件，比如GitLens之类的，这样可以不用手动敲代码
+- 安装 SQL Server ODBC 驱动
 
 ## git操作提示
 本地写代码, 提交之前请先：
