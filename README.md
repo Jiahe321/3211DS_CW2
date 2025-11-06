@@ -15,10 +15,6 @@
 
 实在不会请咨询GPT老师
 
-# 运行提示
-- 先把.env文件扔进SimulatedData文件夹里
-- 然后func start
-
 ## 任务列表
 - Task 1: Simulated Data
 - Task 2: Statistics
