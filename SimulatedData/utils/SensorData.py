@@ -15,10 +15,10 @@ class SensorData:
     def generate_single(self, sensor_id: int) -> dict:
         return {
             "sensor_id": sensor_id,
-            "temperature": round(random.uniform(*self.temp_range), 2),
-            "wind": round(random.uniform(*self.wind_range), 2),
-            "humidity": round(random.uniform(*self.humidity_range), 2),
-            "co2_level": round(random.uniform(*self.co2_level_range), 2)
+            "temperature": random.randint(*self.temp_range),
+            "wind": random.randint(*self.wind_range),
+            "humidity": random.randint(*self.humidity_range),
+            "co2_level": random.randint(*self.co2_level_range)
         }
 
     # 生成所有传感器的数据
