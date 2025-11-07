@@ -2,7 +2,11 @@ import azure.functions as func
 import logging
 import json
 from utils.SensorData import SensorData
-from utils.db import create_table, insert_rows, get_rows, clear_table
+from utils.db import get_conn,create_table, insert_rows, get_rows, clear_table
+import time
+import matplotlib.pyplot as plt
+import io
+import base64
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 logger = logging.getLogger("azure")
@@ -107,3 +111,59 @@ def clear_sensor_data(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             status_code=500
         )
+
+# 目前是顺序请求，之后考虑测并发？
+@app.route(route="performance_test")
+def performance_test(req: func.HttpRequest) -> func.HttpResponse:
+
+    # 预热数据库连接
+    with get_conn() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        conn.commit()
+
+    simulator = SensorData()
+    call_counts = [1, 5, 10, 20, 40]
+    results = []
+
+    for n_calls in call_counts:
+        start = time.time()
+        for _ in range(n_calls):
+            data = simulator.generate_all()
+            insert_rows(data)
+        total_time = time.time() - start
+        avg_time = total_time / n_calls
+        total_data = n_calls * 20  # 每批20条
+
+        results.append({
+            "calls": n_calls,
+            "total_data": total_data,
+            "total_time": total_time,
+            "avg_time": avg_time
+        })
+        print(f"{n_calls} calls: {total_time:.2f}s total, {avg_time:.2f}s/call")
+
+    x = [r["total_data"] for r in results]
+    y = [r["total_time"] for r in results]
+
+    plt.figure(figsize=(7,5))
+    plt.plot(x, y, marker='o', color='royalblue')
+    plt.xlabel("Total data inserted")
+    plt.ylabel("Total time (s)")
+    plt.title("Internal Scalability Test (Azure Function)")
+    plt.grid(True)
+
+    img_bytes = io.BytesIO()
+    plt.savefig(img_bytes, format='png')
+    img_bytes.seek(0)
+    img_base64 = base64.b64encode(img_bytes.read()).decode()
+
+    return func.HttpResponse(
+        json.dumps({
+            "status": "success",
+            "results": results,
+            "image_base64": img_base64
+        }, indent=2),
+        mimetype="application/json",
+        status_code=200
+    )

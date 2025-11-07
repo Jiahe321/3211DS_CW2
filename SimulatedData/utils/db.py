@@ -16,6 +16,7 @@ def get_conn():
     global _conn
     try:
         if _conn is None:
+            logging.info("Creating DB connection...")
             _conn = pyodbc.connect(CONN_STR, autocommit=False, timeout=30)
         yield _conn
     except Exception as e:
