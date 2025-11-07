@@ -9,15 +9,18 @@ CONN_STR = os.getenv("SQL_CONNECTION_STRING")
 if not CONN_STR:
     logging.warning("SQL_CONNECTION_STRING not set in environment.")
 
+_conn = None
+
 @contextmanager
 def get_conn():
-    conn = None
+    global _conn
     try:
-        conn = pyodbc.connect(CONN_STR, autocommit=False, timeout=30)
-        yield conn
-    finally:
-        if conn:
-            conn.close()
+        if _conn is None:
+            _conn = pyodbc.connect(CONN_STR, autocommit=False, timeout=30)
+        yield _conn
+    except Exception as e:
+        logging.error(f"DB connection failed: {e}")
+        raise
 
 # 检查是否有表，没有则创建
 def create_table():
@@ -46,7 +49,7 @@ def insert_rows(rows):
     params = [(r["sensor_id"], r["temperature"], r["wind"], r["humidity"], r["co2_level"]) for r in rows]
     with get_conn() as conn:
         cursor = conn.cursor()
-        cursor.fast_executemany = True # 加速大量插入
+        cursor.fast_executemany = True
         cursor.executemany(insert_sql, params)
         conn.commit()
     return len(params)
