@@ -49,10 +49,18 @@ def generate_sensor_data(req: func.HttpRequest) -> func.HttpResponse:
 def get_sensor_data(req: func.HttpRequest) -> func.HttpResponse:
     try:
         sensor_id = int(req.params.get("sensor_id", 0))
-        rows = get_rows(sensor_id=sensor_id)
+        page = int(req.params.get("page", 1))
+        page_size = int(req.params.get("page_size", 50))
+
+        rows = get_rows(sensor_id=sensor_id, page=page, page_size=page_size)
 
         return func.HttpResponse(
-            json.dumps(rows, default=str, indent=2),
+            json.dumps({
+                "page": page,
+                "page_size": page_size,
+                "rows_returned": len(rows),
+                "data": rows
+            }, default=str, indent=2),
             mimetype="application/json",
             status_code=200
         )
@@ -64,7 +72,6 @@ def get_sensor_data(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             status_code=500
         )
-
 
 # ----------------------------------------------------------
 # 清空数据库表

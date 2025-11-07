@@ -51,36 +51,39 @@ def insert_rows(rows):
         conn.commit()
     return len(params)
 
-def get_rows(sensor_id=0) -> list[dict]:
-    rows = []
+def get_rows(sensor_id=0, page=1, page_size=50) -> list[dict]:
+
+    offset = (page - 1) * page_size
 
     if sensor_id == 0:
-        query_sql = """
+        query_sql = f"""
             SELECT id, sensor_id, temperature, wind, humidity, co2_level, server_ts
             FROM SensorData
             ORDER BY server_ts DESC
+            OFFSET {offset} ROWS
+            FETCH NEXT {page_size} ROWS ONLY;
         """
         params = ()
     else:
-        query_sql = """
+        query_sql = f"""
             SELECT id, sensor_id, temperature, wind, humidity, co2_level, server_ts
             FROM SensorData
             WHERE sensor_id = ?
             ORDER BY server_ts DESC
+            OFFSET {offset} ROWS
+            FETCH NEXT {page_size} ROWS ONLY;
         """
         params = (sensor_id,)
 
+    rows = []
     with get_conn() as conn:
         cursor = conn.cursor()
         cursor.execute(query_sql, params)
         columns = [col[0] for col in cursor.description]
-        data = cursor.fetchall()
-
-    for row in data:
-        rows.append(dict(zip(columns, row)))
+        for row in cursor.fetchall():
+            rows.append(dict(zip(columns, row)))
 
     return rows
-
 
 def clear_table():
     delete_sql = "DELETE FROM SensorData"
