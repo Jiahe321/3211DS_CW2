@@ -73,6 +73,8 @@ def ensure_table_exists():
             logger.warning(f"Skipping table creation (may already exist): {e}")
 
 
+simulator = SensorData() # 全局变量，优化性能
+
 # ----------------------------------------
 # 路由：生成并插入数据
 # ----------------------------------------
@@ -82,7 +84,6 @@ def generate_sensor_data(req: func.HttpRequest) -> func.HttpResponse:
     conn = get_global_conn()
 
     logger.info("Generating simulated IoT sensor data...")
-    simulator = SensorData()
     data_dicts = simulator.generate_all()
 
     try:
@@ -174,7 +175,6 @@ def performance_test(req: func.HttpRequest) -> func.HttpResponse:
     ensure_table_exists()
     conn = get_global_conn()
 
-    simulator = SensorData()
     call_counts = [1, 5, 10, 20, 40]
     results = []
 
