@@ -16,9 +16,10 @@
 
 实在不会请咨询GPT老师
 ## Azure操作指南
+* [免费部署 Azure SQL 数据库](https://learn.microsoft.com/zh-cn/azure/azure-sql/database/free-offer?view=azuresql)
 * [使用 Visual Studio Code 创建函数代码并将其部署到 Azure](https://learn.microsoft.com/zh-cn/azure/azure-functions/how-to-create-function-vs-code?pivots=programming-language-python)
 * [在 Azure 门户中创建函数应用](https://learn.microsoft.com/zh-cn/azure/azure-functions/functions-create-function-app-portal?pivots=flex-consumption-plan&tabs=core-tools)
-* [免费部署 Azure SQL 数据库](https://learn.microsoft.com/zh-cn/azure/azure-sql/database/free-offer?view=azuresql)
+
 
 ## 任务列表
 - Task 1: Simulated Data （差不多完成了）
