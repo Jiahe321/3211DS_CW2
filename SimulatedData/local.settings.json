@@ -1,0 +1,8 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "SQL_CONNECTION_STRING": "Driver={ODBC Driver 18 for SQL Server};Server=tcp:silksong.database.windows.net,1433;Database=leedsSensorsData;Uid=Hornet@silksong;Pwd=[这里是密码];Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+  }
+}
