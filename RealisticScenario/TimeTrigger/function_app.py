@@ -5,8 +5,7 @@ import requests
 
 app = func.FunctionApp()
 
-SIMULATED_DATA_URL = os.getenv("TASK1_FUNCTION_URL") # 暂时先用本地的，部署后再调
-
+SIMULATED_DATA_URL = os.getenv("SIMULATED_FUNCTION_URL")
 @app.timer_trigger(schedule="*/10 * * * * *", arg_name="myTimer", run_on_startup=False, use_monitor=False)
 def timer_trigger(myTimer: func.TimerRequest) -> None:
     if myTimer.past_due:
