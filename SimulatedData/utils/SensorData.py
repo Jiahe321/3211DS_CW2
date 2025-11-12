@@ -1,6 +1,4 @@
 import random
-import json
-import pandas as pd
 
 class SensorData:
 
@@ -24,14 +22,3 @@ class SensorData:
     # 生成所有传感器的数据
     def generate_all(self) -> list[dict]:
         return [self.generate_single(i+1) for i in range(self.num_sensors)]
-
-    # 以 JSON 形式返回数据
-    def to_json(self) -> str:
-        data = self.generate_all()
-        return json.dumps(data, indent=2)
-
-if __name__ == "__main__":
-    simulator = SensorData()
-    data_json = simulator.to_json()
-    print(data_json)
-
