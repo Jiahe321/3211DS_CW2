@@ -1,9 +1,12 @@
 import json
 import logging
 import azure.functions as func
+import requests
+import os
 
 app = func.FunctionApp()
 
+STATISTICS_DATA_URL = os.getenv("STATISTICS_FUNCTION_URL")
 @app.function_name(name="SensorSQLTrigger")
 @app.sql_trigger(
     arg_name="changes",
@@ -17,7 +20,9 @@ def sensor_trigger(changes: str) -> None:
 
         if count > 0:
             logging.info(f"数据库变动！共检测到 {count} 条变动。")
-            # TODO：在这里实现你的逻辑
+
+            response = requests.get(STATISTICS_DATA_URL)
+            logging.info(f"Fetched simulated data: {response.status_code} - {response.text}")    
         else:
             logging.info("数据库变动，但没有新行。")
     except Exception as e:
