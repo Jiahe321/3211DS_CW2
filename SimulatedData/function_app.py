@@ -175,37 +175,66 @@ def performance_test(req: func.HttpRequest) -> func.HttpResponse:
     ensure_table_exists()
     conn = get_global_conn()
 
-    call_counts = [1, 5, 10, 20, 40 , 60, 80, 100]
-    results = []
+    sample_batch = simulator.generate_all()
+    batch_size = len(sample_batch)
+    logger.info(f"Detected batch size = {batch_size}")
+
+    call_counts = [1, 5, 10, 20, 40, 60, 80, 100]
+    seq_results = []
 
     for n_calls in call_counts:
         start = time.time()
-        for _ in range(n_calls):
-            data = simulator.generate_all()
-            insert_rows(conn, data)
+        inserted = 0
+        try:
+            for _ in range(n_calls):
+                data = simulator.generate_all()
+                inserted += insert_rows(conn, data)
+            conn.commit()
+        except Exception as e:
+            logger.error(f"Error during sequential inserts: {e}")
+            try:
+                conn.rollback()
+            except Exception:
+                pass
         total_time = time.time() - start
-        avg_time = total_time / n_calls
-        total_data = n_calls * 20  # 每批20条
+        total_data = n_calls * batch_size
+        throughput = total_data / total_time if total_time > 0 else 0
 
-        results.append(
+        seq_results.append(
             {
                 "calls": n_calls,
                 "total_data": total_data,
                 "total_time": total_time,
-                "avg_time": avg_time,
+                "avg_time_per_call": total_time / n_calls if n_calls else None,
+                "throughput_rows_per_s": throughput,
+                "rows_inserted": inserted,
             }
         )
-        logger.info(f"{n_calls} calls: {total_time:.2f}s total, {avg_time:.2f}s/call")
+        logger.info(f"Seq {n_calls} calls -> {total_data} rows: {total_time:.2f}s, {throughput:.2f} rows/s")
 
-    # 绘制结果图
-    x = [r["total_data"] for r in results]
-    y = [r["total_time"] for r in results]
-    plt.figure(figsize=(7, 5))
-    plt.plot(x, y, marker="o", color="royalblue")
-    plt.xlabel("Total data inserted")
-    plt.ylabel("Total time (s)")
-    plt.title("Internal Scalability Test (Azure Function)")
-    plt.grid(True)
+
+    x_seq = [r["total_data"] for r in seq_results]
+    y_seq_time = [r["total_time"] for r in seq_results]
+    y_seq_tp = [r["throughput_rows_per_s"] for r in seq_results]
+
+    fig, ax_time = plt.subplots(figsize=(9, 5))
+
+    ax_time.plot(x_seq, y_seq_time, marker='o', label='Total time (s)')
+    ax_time.set_xlabel("Total data inserted (rows)")
+    ax_time.set_ylabel("Total time (s)")
+    ax_time.grid(True)
+
+    ax_tp = ax_time.twinx()
+    ax_tp.plot(x_seq, y_seq_tp, marker='x', linestyle='--', label='Throughput (rows/s)')
+    ax_tp.set_ylabel("Throughput (rows/s)")
+
+    lines_time, labels_time = ax_time.get_legend_handles_labels()
+    lines_tp, labels_tp = ax_tp.get_legend_handles_labels()
+    ax_time.legend(lines_time + lines_tp, labels_time + labels_tp, loc='best')
+
+    ax_time.set_title("Data Scalability: time & throughput vs total rows")
+
+    plt.tight_layout()
 
     img_bytes = io.BytesIO()
     plt.savefig(img_bytes, format="png")
@@ -213,7 +242,15 @@ def performance_test(req: func.HttpRequest) -> func.HttpResponse:
     img_base64 = base64.b64encode(img_bytes.read()).decode()
 
     return func.HttpResponse(
-        json.dumps({"status": "success", "results": results, "image_base64": img_base64}, indent=2),
+        json.dumps(
+            {
+                "status": "success",
+                "data_scalability_results": seq_results,
+                "image_base64": img_base64,
+            },
+            indent=2,
+            default=str,
+        ),
         mimetype="application/json",
         status_code=200,
     )

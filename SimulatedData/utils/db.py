@@ -53,8 +53,10 @@ def get_rows(conn, sensor_id=0, page=1, page_size=50):
     return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
 def clear_table(conn):
-    delete_sql = "DELETE FROM SensorData"
     cursor = conn.cursor()
-    cursor.execute(delete_sql)
+
+    cursor.execute("DELETE FROM SensorData")
+    cursor.execute("DBCC CHECKIDENT ('SensorData', RESEED, 0)")
+
     conn.commit()
     return cursor.rowcount

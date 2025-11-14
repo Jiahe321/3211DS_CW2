@@ -3,7 +3,13 @@
   "Values": {
     "AzureWebJobsStorage": "",
     "FUNCTIONS_WORKER_RUNTIME": "python",
-    "STATISTICS_FUNCTION_URL": "http://localhost:7071/api/calculate_statistics",
-    "SQL_CONNECTION_STRING": "Server=tcp:silksong.database.windows.net,1433;Database=leedsSensorsData;Uid=Hornet@silksong;Pwd=WeNeedDLC!;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+    "STATISTICS_FUNCTION_URL": "https://statisticsdata.azurewebsites.net/api/calculate_statistics",
+    "SQL_CONNECTION_STRING": "Server=tcp:silksong.database.windows.net,1433;Initial Catalog=leedsSensorsData;Persist Security Info=False;User ID=Hornet;Password=WeNeedDLC!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
+    "APPLICATIONINSIGHTS_CONNECTION_STRING": "InstrumentationKey=967ed83e-8da8-487a-9d8d-e9c7560f567a;IngestionEndpoint=https://southeastasia-1.in.applicationinsights.azure.com/;LiveEndpoint=https://southeastasia.livediagnostics.monitor.azure.com/;ApplicationId=8124aac5-9737-4317-a960-77fb0a122590",
+    "AzureWebJobsStorage__blobServiceUri": "https://sqltrigger2.blob.core.windows.net",
+    "AzureWebJobsStorage__clientId": "0131a528-a83f-462d-a469-2f46de754566",
+    "AzureWebJobsStorage__credential": "managedidentity",
+    "AzureWebJobsStorage__queueServiceUri": "https://sqltrigger2.queue.core.windows.net",
+    "AzureWebJobsStorage__tableServiceUri": "https://sqltrigger2.table.core.windows.net"
   }
 }
