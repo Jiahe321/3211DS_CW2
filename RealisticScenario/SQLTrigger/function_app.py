@@ -7,6 +7,9 @@ import os
 app = func.FunctionApp()
 
 STATISTICS_DATA_URL = os.getenv("STATISTICS_FUNCTION_URL")
+
+logging.info("function_app.py loaded successfully.")
+
 @app.function_name(name="SensorSQLTrigger")
 @app.sql_trigger(
     arg_name="changes",
@@ -19,11 +22,19 @@ def sensor_trigger(changes: str) -> None:
         count = len(data)
 
         if count > 0:
-            logging.info(f"数据库变动！共检测到 {count} 条变动。")
+            logging.info(f"DB changed! {count} line(s) affected.")
 
-            response = requests.get(STATISTICS_DATA_URL)
-            logging.info(f"Fetched simulated data: {response.status_code} - {response.text}")    
+            if not STATISTICS_DATA_URL:
+                logging.warning("STATISTICS_FUNCTION_URL not set. Skipping API call.")
+            else:
+                try:
+                    # 设置 timeout，防止阻塞
+                    response = requests.get(STATISTICS_DATA_URL, timeout=5)
+                    logging.info(f"Fetched simulated data: {response.status_code} - {response.text}")
+                except Exception as e:
+                    logging.error(f"HTTP request failed: {e}")
         else:
-            logging.info("数据库变动，但没有新行。")
+            logging.info("DB changed! No lines affected.")
+
     except Exception as e:
-        logging.error(f"处理 SQL 触发数据时出错: {e}")
+        logging.error(f"Error processing SQL trigger: {e}")

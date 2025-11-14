@@ -175,7 +175,7 @@ def performance_test(req: func.HttpRequest) -> func.HttpResponse:
     ensure_table_exists()
     conn = get_global_conn()
 
-    call_counts = [1, 5, 10, 20, 40]
+    call_counts = [1, 5, 10, 20, 40 , 60, 80, 100]
     results = []
 
     for n_calls in call_counts:
