@@ -1,9 +1,9 @@
 {
   "IsEncrypted": false,
   "Values": {
-    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "AzureWebJobsStorage": "",
     "FUNCTIONS_WORKER_RUNTIME": "python",
-    "SQL_CONNECTION_STRING": "Server=tcp:silksong.database.windows.net,1433;Initial Catalog=leedsSensorsData;Persist Security Info=False;User ID=Hornet;Password=WeNeedDLC!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
-    "STATISTICS_FUNCTION_URL": "https://statisticsdata.azurewebsites.net/api/calculate_statistics"
+    "STATISTICS_FUNCTION_URL": "http://localhost:7071/api/calculate_statistics",
+    "SQL_CONNECTION_STRING": "Server=tcp:silksong.database.windows.net,1433;Database=leedsSensorsData;Uid=Hornet@silksong;Pwd=WeNeedDLC!;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
   }
 }
