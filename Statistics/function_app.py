@@ -9,7 +9,6 @@ app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 logger = logging.getLogger("azure")
 logger.setLevel(logging.INFO)
 
-# 数据库连接配置
 _db_conn = None
 _CONN_STR = os.getenv("SQL_CONNECTION_STRING")
 
@@ -22,7 +21,6 @@ def get_db_connection():
         raise RuntimeError("SQL_CONNECTION_STRING not set")
     
     try:
-        # 验证现有连接
         if _db_conn is not None:
             cursor = _db_conn.cursor()
             cursor.execute("SELECT 1")
@@ -31,31 +29,26 @@ def get_db_connection():
     except:
         _db_conn = None
     
-    # 创建新连接
     _db_conn = pyodbc.connect(_CONN_STR, timeout=30)
     logger.info("Database connection established")
     return _db_conn
 
-
-# ======================================
-# Task 2: Statistics Function (表格输出)
-# ======================================
 @app.route(route="calculate_statistics", methods=["GET"])
 def calculate_statistics(req: func.HttpRequest) -> func.HttpResponse:
     """
-    Task 2: 计算每个传感器的统计数据
+    Task 2: Calculate the statistical data for each sensor
     
-    功能：
-    - 读取数据库中所有传感器的数据
-    - 计算每个传感器（1-20）的 min, max, avg
-    - 涵盖 4 个数据字段：Temperature, Wind, Humidity, CO2 Level
-    - 以纯文本表格形式输出
+    Function:
+    - Read all sensor data from the database
+    - Calculate the min, max, and average values for each sensor (1-20)
+    - Include 4 data fields: Temperature, Wind, Humidity, CO2 Level
+    - Output in plain text table format
     """
     try:
         conn = get_db_connection()
         logger.info("Calculating statistics for all sensors...")
         
-        # SQL 查询：按 sensor_id 分组计算统计值
+        # SQL Query: Calculate statistical values by grouping by sensor_id
         query = """
         SELECT 
             sensor_id,
@@ -81,7 +74,6 @@ def calculate_statistics(req: func.HttpRequest) -> func.HttpResponse:
         cursor.execute(query)
         rows = cursor.fetchall()
         
-        # 检查是否有数据
         if not rows:
             logger.warning("No data found in database")
             return func.HttpResponse(
@@ -90,7 +82,7 @@ def calculate_statistics(req: func.HttpRequest) -> func.HttpResponse:
                 status_code=200
             )
         
-        # 构建表格数据
+        # Construct table data
         table_data = []
         for row in rows:
             table_row = [
@@ -111,7 +103,7 @@ def calculate_statistics(req: func.HttpRequest) -> func.HttpResponse:
             ]
             table_data.append(table_row)
         
-        # 定义表头
+        # Define table headers
         headers = [
             'Sensor_ID', 'Records',
             'Temp_Min', 'Temp_Max', 'Temp_Avg',
@@ -120,12 +112,11 @@ def calculate_statistics(req: func.HttpRequest) -> func.HttpResponse:
             'CO2_Min', 'CO2_Max', 'CO2_Avg'
         ]
         
-        # 生成ASCII表格
+        # ASCII table
         table_text = tabulate.tabulate(table_data, headers=headers, tablefmt='grid', floatfmt='.1f')
         
         logger.info(f"Statistics calculated successfully for {len(table_data)} sensors")
-        
-        # 返回纯文本表格
+
         return func.HttpResponse(
             table_text,
             mimetype="text/plain",

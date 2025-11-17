@@ -18,12 +18,11 @@ logging.info("function_app.py loaded successfully.")
 )
 def sensor_trigger(changes: str) -> None:
     """
-    Task 3: SQL Trigger - 当数据库更新时自动触发统计计算
-    
-    当SensorData表有数据变化时：
-    1. 检测变化的行数
-    2. 自动调用Statistics Function重新计算
-    3. 记录统计结果到日志
+    Task 3: SQL Trigger - Automatically trigger statistical calculations when the database is updated.
+    When there is a data change in the SensorData table:
+    1. Detect the number of changed rows
+    2. Automatically call the Statistics Function to recalculate
+    3. Record the statistical results in the log
     """
     try:
         data = json.loads(changes)
@@ -32,15 +31,15 @@ def sensor_trigger(changes: str) -> None:
         if count > 0:
             logging.info(f"Database changed! {count} line(s) affected.")
             
-            # 调用统计函数重新计算
+            # Call the statistical function to recalculate
             logging.info(f"Triggering statistics calculation...")
             response = requests.get(STATISTICS_DATA_URL, timeout=30)
             
             if response.status_code == 200:
-                # 获取表格文本
+                # Obtain the text of the table
                 table_text = response.text
                 
-                # 记录统计信息
+                # Record statistical information
                 logging.info("Statistics calculated successfully!")
                 logging.info("Statistics Table:")
                 logging.info("\n" + table_text)

@@ -12,21 +12,15 @@ import base64
 from utils.SensorData import SensorData
 from utils.db import create_table, insert_rows, get_rows, clear_table
 
-# ----------------------------------------
-# 基础配置
-# ----------------------------------------
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 logger = logging.getLogger("azure")
 logger.setLevel(logging.INFO)
 
-# ----------------------------------------
-# 全局数据库连接缓存
-# ----------------------------------------
 _db_conn = None
 _CONN_STR = os.getenv("SQL_CONNECTION_STRING")
 
 
-# 获取全局数据库连接
+# Obtain the global database connection
 def get_global_conn():
     global _db_conn
 
@@ -34,7 +28,6 @@ def get_global_conn():
         raise RuntimeError("Environment variable SQL_CONNECTION_STRING not set")
 
     try:
-        # 如果已有连接，尝试验证
         if _db_conn is not None:
             cursor = _db_conn.cursor()
             cursor.execute("SELECT 1")
@@ -54,10 +47,6 @@ def get_global_conn():
 
     return _db_conn
 
-
-# ----------------------------------------
-# 初始化数据表（仅执行一次）
-# ----------------------------------------
 _table_created = False
 
 
@@ -73,11 +62,8 @@ def ensure_table_exists():
             logger.warning(f"Skipping table creation (may already exist): {e}")
 
 
-simulator = SensorData() # 全局变量，优化性能
+simulator = SensorData() 
 
-# ----------------------------------------
-# 路由：生成并插入数据
-# ----------------------------------------
 @app.route(route="generate_sensor_data")
 def generate_sensor_data(req: func.HttpRequest) -> func.HttpResponse:
     ensure_table_exists()
@@ -103,10 +89,6 @@ def generate_sensor_data(req: func.HttpRequest) -> func.HttpResponse:
             status_code=500,
         )
 
-
-# ----------------------------------------
-# 路由：查询数据
-# ----------------------------------------
 @app.route(route="get_sensor_data")
 def get_sensor_data(req: func.HttpRequest) -> func.HttpResponse:
     ensure_table_exists()
@@ -141,9 +123,6 @@ def get_sensor_data(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 
-# ----------------------------------------
-# 路由：清空数据库
-# ----------------------------------------
 @app.route(route="clear_sensor_data")
 def clear_sensor_data(req: func.HttpRequest) -> func.HttpResponse:
     ensure_table_exists()
@@ -166,10 +145,6 @@ def clear_sensor_data(req: func.HttpRequest) -> func.HttpResponse:
             status_code=500,
         )
 
-
-# ----------------------------------------
-# 路由：性能测试
-# ----------------------------------------
 @app.route(route="performance_test")
 def performance_test(req: func.HttpRequest) -> func.HttpResponse:
     ensure_table_exists()
