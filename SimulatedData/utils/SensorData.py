@@ -9,7 +9,6 @@ class SensorData:
         self.humidity_range = (30, 60)
         self.co2_level_range = (400, 1600)
 
-    # Generate the data of the specified sensor
     def generate_single(self, sensor_id: int) -> dict:
         return {
             "sensor_id": sensor_id,
@@ -19,6 +18,5 @@ class SensorData:
             "co2_level": random.randint(*self.co2_level_range)
         }
 
-    # Generate all the data of the sensors
     def generate_all(self) -> list[dict]:
         return [self.generate_single(i+1) for i in range(self.num_sensors)]
