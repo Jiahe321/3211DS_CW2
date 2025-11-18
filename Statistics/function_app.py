@@ -14,7 +14,6 @@ _CONN_STR = os.getenv("SQL_CONNECTION_STRING")
 
 
 def get_db_connection():
-    """获取数据库连接（带连接池）"""
     global _db_conn
     
     if not _CONN_STR:
